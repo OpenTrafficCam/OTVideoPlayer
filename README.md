@@ -10,9 +10,12 @@ Clone this repository (or download and unzip)
 
 ### Windows
 
+Open Terminal window from outer OTVideoPlayer folder:
+
 - Create virtual environment: ```python -m venv venv```
 - Activate virtual environment: ```venv\Scripts\activate```
 - Install dependencies: ```pip install -r requirements.txt```
+- Run app: ```python OTVideoPlayer```
 - Deactivate virtual environment: ```deactivate```
 
 ## API usage example
