@@ -1,6 +1,7 @@
 import datetime as dt
 import re
 
+EPOCH = dt.datetime.utcfromtimestamp(0)
 
 def _get_datetime_from_filename(
     filename: str, epoch_datetime="1970-01-01_00-00-00"

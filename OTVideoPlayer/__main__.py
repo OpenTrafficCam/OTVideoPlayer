@@ -11,7 +11,7 @@ import pandas as pd
 import PIL.Image
 import PIL.ImageTk
 
-from helpers import _get_datetime_from_filename
+from helpers import EPOCH, _get_datetime_from_filename
 
 
 class WindowVideoPlayer(tk.Tk):
@@ -209,9 +209,10 @@ class FrameVideoPlayer(tk.LabelFrame):
             )
 
     def get_timestamp(self):
-        epoch = datetime.datetime.utcfromtimestamp(0)
-        return (self.vid.current_time - epoch).total_seconds(), int(
-            self.vid.current_frame
+        return (
+            (self.vid.current_time - EPOCH).total_seconds(),
+            (self.vid.current_time - self.vid.start_time).total_seconds(),
+            int(self.vid.current_frame),
         )
 
 
@@ -307,8 +308,25 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         [self.add_button(label=label.rstrip()) for label in labels]
 
     def add_timestamp(self, label):
-        timestamp, frame = self.master.frame_video_player.get_timestamp()
-        self.timestamps.append({"timestamp": timestamp, "frame": frame, "event": label})
+        import os
+
+        videopath = self.master.frame_video_player.video_path
+        (
+            timestamp_real,
+            timestamp_video,
+            frame,
+        ) = self.master.frame_video_player.get_timestamp()
+        self.timestamps.append(
+            {
+                "realtime": timestamp_real,
+                "videotime": timestamp_video,
+                "frame": frame,
+                "event": label,
+                "videopath": videopath,
+                "created": (datetime.datetime.now() - EPOCH).total_seconds(),
+                "creator": os.getlogin(),
+            }
+        )
         print("Timestamps:")
         print(self.timestamps)
 
@@ -328,6 +346,7 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         )
         timestamps_loaded = pd.read_csv(path).to_dict(orient="records")
         self.timestamps = timestamps_loaded + self.timestamps
+        # TODO: Handle duplicates
 
 
 def main():
