@@ -48,11 +48,7 @@ class WindowVideoPlayer(tk.Tk):
         )
         self.menu_quick_timestamps.add_command(
             label="Add button",
-            command=lambda: self.frame_quick_timestamps.add_button(
-                label=simpledialog.askstring(
-                    "Button label", "Enter description for time stamp:"
-                )
-            ),
+            command=lambda: self.frame_quick_timestamps.add_button(),
         )
         self.menu_quick_timestamps.add_command(
             label="Delete last button",
@@ -258,8 +254,15 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         self.btns = {}
         self.timestamps = []
 
-    def add_button(self, label):
-        if label not in list(self.btns.keys()):
+    def add_button(self):
+        label = simpledialog.askstring(
+            "Button label", "Enter description for time stamp:"
+        )
+        if not label:
+            messagebox.showinfo("Button has to have a label", "Please choose a label")
+        elif label in list(self.btns.keys()):
+            messagebox.showinfo("Button already exists", "Please choose another label")
+        else:
             self.btns[label] = tk.Button(
                 self,
                 text=label,
@@ -268,8 +271,6 @@ class FrameQuickTimeStamps(tk.LabelFrame):
             self.btns[label].pack(
                 anchor=tk.CENTER, expand=True, side="left", padx=5, pady=5
             )
-        else:
-            messagebox.showinfo("Button already exists", "Please choose another name")
 
     def delete_button(self, label=None):
         if len(self.btns) > 0:
