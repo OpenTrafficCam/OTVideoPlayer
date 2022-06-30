@@ -1,4 +1,3 @@
-import csv
 import datetime
 import time
 import tkinter as tk
