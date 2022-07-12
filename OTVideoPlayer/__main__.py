@@ -20,6 +20,7 @@ class WindowVideoPlayer(tk.Tk):
         self.update_layout()
         if video_path:
             self.frame_video_player.update_video(video_path=video_path)
+        self.width, self.height = self.winfo_screenmmwidth(), self.winfo_screenheight()
         self.state("zoomed")
         self.mainloop()
 
@@ -91,11 +92,13 @@ class WindowVideoPlayer(tk.Tk):
 
 
 class FrameVideoPlayer(tk.LabelFrame):
-    def __init__(self, video_path=None, **kwargs):
+    def __init__(self, video_path=None, canvas_height=500, **kwargs):
         super().__init__(**kwargs)
 
         self.paused = True
         self.update_video(video_path=video_path)
+
+        self.canvas_height = canvas_height
 
         self.symbol_font_size = 15
         self.symbol_font = font.Font(
@@ -109,7 +112,11 @@ class FrameVideoPlayer(tk.LabelFrame):
     def update_layout(self):
 
         # Create a canvas that can fit the above video source size
-        self.canvas = tk.Canvas(self, width=self.vid.width, height=self.vid.height)
+        self.canvas = tk.Canvas(
+            self,
+            width=int(self.canvas_height * self.vid.width / self.vid.height),
+            height=self.canvas_height,
+        )
         self.canvas.pack()
 
         # Play/pause button
@@ -195,7 +202,12 @@ class FrameVideoPlayer(tk.LabelFrame):
         ret, self.frame = self.vid.get_frame(frame_number=frame_number)
 
         if ret:
-            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(self.frame))
+            scale = self.canvas_height / self.vid.height
+            self.photo = PIL.ImageTk.PhotoImage(
+                image=PIL.Image.fromarray(self.frame).resize(
+                    (int(scale * self.vid.width), int(scale * self.vid.height))
+                )
+            )
             self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
             self.slider_frame_var.set(self.vid.current_frame)
             self.label_current_time_var.set(
