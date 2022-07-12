@@ -128,6 +128,28 @@ class FrameVideoPlayer(tk.LabelFrame):
         )
         self.btn_play_pause.pack(anchor=tk.CENTER, expand=True, side="left")
 
+        # Move frames buttons
+        delta_frames_list = [-1, +1]
+        self.btn_set_delta_frames = {}
+        for delta_frames in delta_frames_list:
+            delta_frames_str = (
+                f"+{str(delta_frames)}" if delta_frames > 0 else str(delta_frames)
+            )
+            self.btn_set_delta_frames[delta_frames] = tk.Button(
+                self,
+                text=delta_frames_str,
+                # command=lambda: self.set_delta_frames(delta_frames=delta_frames),
+            )
+            self.btn_set_delta_frames[delta_frames].bind(
+                "<ButtonRelease-1>",
+                lambda event, btn=self.btn_set_delta_frames[
+                    delta_frames
+                ]: self.set_delta_frames(event, btn, delta_frames),
+            )  # BUG: #2 Only last delta_frames from delta_frames_list sent to fun
+            self.btn_set_delta_frames[delta_frames].pack(
+                anchor=tk.CENTER, expand=True, side="left"
+            )
+
         # Slider
         self.slider_frame_var = tk.IntVar()
         self.slider_frame = tk.Scale(
@@ -199,6 +221,18 @@ class FrameVideoPlayer(tk.LabelFrame):
     def slide(self, event):
         frame_number = int(float(self.slider_frame.get()))
         self.display_new_frame(frame_number)
+
+    def set_delta_frames(self, event, btn, delta_frames: int):
+        print(f"delta_frames: {delta_frames}")
+        if self.paused:
+            if delta_frames == 0:
+                pass
+            elif delta_frames == 1:
+                self.display_new_frame()
+            else:
+                print(delta_frames)
+                new_frame = self.vid.current_frame + delta_frames
+                self.display_new_frame(new_frame)
 
     def display_new_frame(self, frame_number=None):
         # Get a frame from the video source
