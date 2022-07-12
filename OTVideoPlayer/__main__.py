@@ -195,10 +195,17 @@ class FrameVideoPlayer(tk.LabelFrame):
 
     def snapshot(self):
         # Get a frame from the video source
-        if self.frame:
+        if self.frame.any():
+            video_path = Path(self.video_path)
+            video_time_str = self.vid.current_time.strftime("%Y-%m-%d_%H-%M-%S-%f")[:-3]
+            snapshot_path_str = str(
+                video_path.with_stem(f"{video_path.stem}_{video_time_str}").with_suffix(
+                    ".jpg"
+                )
+            )
             cv2.imwrite(
-                "frame-" + time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg",
-                cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR),
+                filename=snapshot_path_str,
+                img=cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR),
             )
 
     def play(self, next_show=None, previous_time=None):
