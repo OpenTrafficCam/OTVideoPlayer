@@ -1,6 +1,5 @@
 import datetime
 import tkinter as tk
-from doctest import master
 from pathlib import Path
 from tkinter import filedialog, font, messagebox, simpledialog
 
@@ -84,7 +83,6 @@ class WindowVideoPlayer(tk.Tk):
             label="Save time stamps",
             command=lambda: self.frame_quick_timestamps.save(),
         )
-
 
     def open_file(self):
         video_path = filedialog.askopenfilename()
