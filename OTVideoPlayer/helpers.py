@@ -1,7 +1,22 @@
 import datetime as dt
+import platform
 import re
 
 EPOCH = dt.datetime.utcfromtimestamp(0)
+"""Time from unix epoch in seconds"""
+
+OS = platform.system().replace("Darwin", "Mac")
+"""OS OTVision is currently running on"""
+
+ON_WINDOWS = OS == "Windows"
+"""Wether OS is Windows or not"""
+
+ON_LINUX = OS == "Linux"
+"""Wether OS is Linux or not"""
+
+ON_MAC = OS == "Mac"
+"""Wether OS is MacOS or not"""
+
 
 def _get_datetime_from_filename(
     filename: str, epoch_datetime="1970-01-01_00-00-00"
