@@ -136,10 +136,9 @@ class FrameVideoPlayer(tk.LabelFrame):
             length=400,
             from_=1,
             to=self.vid.total_frames,
-            command=lambda event: self.display_new_frame(int(float(event))),
         )
+        self.slider_frame.bind("<ButtonRelease-1>", self.slide)
         self.slider_frame.pack(anchor=tk.CENTER, expand=True, side="left")
-        # TODO: #1 Move slider when playback
 
         # Current time
         self.label_current_time_var = tk.StringVar()
@@ -197,6 +196,10 @@ class FrameVideoPlayer(tk.LabelFrame):
         elif self.after_id:
             self.after_cancel(self.after_id)
 
+    def slide(self, event):
+        frame_number = int(float(self.slider_frame.get()))
+        self.display_new_frame(frame_number)
+
     def display_new_frame(self, frame_number=None):
         # Get a frame from the video source
         ret, self.frame = self.vid.get_frame(frame_number=frame_number)
@@ -209,7 +212,7 @@ class FrameVideoPlayer(tk.LabelFrame):
                 )
             )
             self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-            self.slider_frame_var.set(self.vid.current_frame)
+            self.slider_frame.set(self.vid.current_frame)
             self.label_current_time_var.set(
                 datetime.datetime.strftime(
                     self.vid.current_time, "%d.%m.%Y %H:%M:%S.%f"
