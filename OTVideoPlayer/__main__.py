@@ -1,5 +1,4 @@
 import datetime
-import time
 import tkinter as tk
 from doctest import master
 from pathlib import Path
@@ -86,6 +85,7 @@ class WindowVideoPlayer(tk.Tk):
             command=lambda: self.frame_quick_timestamps.save(),
         )
 
+
     def open_file(self):
         video_path = filedialog.askopenfilename()
         self.frame_video_player.update_video(video_path=video_path)
@@ -118,6 +118,7 @@ class FrameVideoPlayer(tk.LabelFrame):
             height=self.canvas_height,
         )
         self.canvas.pack()
+        # self.canvas.config(width=200, height=200)
 
         # Play/pause button
         self.btn_play_pause = tk.Button(
@@ -230,14 +231,12 @@ class FrameVideoPlayer(tk.LabelFrame):
         self.display_new_frame(frame_number)
 
     def set_delta_frames(self, event, btn, delta_frames: int):
-        print(f"delta_frames: {delta_frames}")
         if self.paused:
             if delta_frames == 0:
                 pass
             elif delta_frames == 1:
                 self.display_new_frame()
             else:
-                print(delta_frames)
                 new_frame = self.vid.current_frame + delta_frames
                 self.display_new_frame(new_frame)
 
