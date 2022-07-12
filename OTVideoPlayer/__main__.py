@@ -20,6 +20,7 @@ class WindowVideoPlayer(tk.Tk):
         self.update_layout()
         if video_path:
             self.frame_video_player.update_video(video_path=video_path)
+        self.state("zoomed")
         self.mainloop()
 
     def update_layout(self):
