@@ -11,6 +11,7 @@ from helpers import EPOCH
 class FrameQuickTimeStamps(tk.LabelFrame):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.path = filedialog.asksaveasfilename(defaultextension=".csv")
         self.btns = {}
         self.timestamps = []
 
@@ -92,9 +93,8 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         print(self.timestamps)
 
     def save(self):
-        path = filedialog.asksaveasfilename(defaultextension=".csv")
         print(pd.DataFrame(self.timestamps))
-        pd.DataFrame(self.timestamps).to_csv(path, index=False)
+        pd.DataFrame(self.timestamps).to_csv(self.path, index=False)
         pd.DataFrame(self.timestamps).to_csv(
             Path("last.OTQuickTimeStamps"), index=False
         )
@@ -108,3 +108,49 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         timestamps_loaded = pd.read_csv(path).to_dict(orient="records")
         self.timestamps = timestamps_loaded + self.timestamps
         # TODO: Handle duplicates
+
+def layout_menu_quick_time_stamps(parent):
+    # Menu quick time stamps
+    parent.menu_quick_timestamps = tk.Menu(parent.menubar)
+    parent.menubar.add_cascade(
+            menu=parent.menu_quick_timestamps, label="Quick time stamps"
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Add button",
+            command=lambda: parent.frame_quick_timestamps.add_button(),
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Delete last button",
+            command=parent.frame_quick_timestamps.delete_button,
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Delete all buttons",
+            command=parent.frame_quick_timestamps.delete_all_buttons,
+        )
+    parent.menu_quick_timestamps.add_separator()
+    parent.menu_quick_timestamps.add_command(
+            label="Load last buttons",
+            command=lambda: parent.frame_quick_timestamps.load_buttons(last=True),
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Load buttons",
+            command=lambda: parent.frame_quick_timestamps.load_buttons(),
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Save buttons",
+            command=lambda: parent.frame_quick_timestamps.save_buttons(),
+        )
+    parent.menu_quick_timestamps.add_separator()
+    parent.menu_quick_timestamps.add_command(
+            label="Load last time stamps",
+            command=lambda: parent.frame_quick_timestamps.load(last=True),
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Load time stamps",
+            command=lambda: parent.frame_quick_timestamps.load(),
+        )
+    parent.menu_quick_timestamps.add_command(
+            label="Save time stamps",
+            command=lambda: parent.frame_quick_timestamps.save(),
+        )
+
