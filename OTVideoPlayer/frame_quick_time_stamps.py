@@ -47,6 +47,12 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         self.bind_keyboard_and_mouse_events()
 
     def layout(self):
+        # Heading
+        self.label_heading = tk.Label(
+            master=self, text="QuickTimeStamps", font=("Arial", 14)
+        )
+        self.label_heading.pack()
+
         # Frames
         self.frame_tree = tk.Frame(master=self)
         self.frame_tree.pack(fill="both", expand=True)

@@ -60,6 +60,12 @@ class FrameVideoPlayer(tk.LabelFrame):
 
     def layout(self):
 
+        # Heading
+        self.label_heading = tk.Label(
+            master=self, text="OTVideoPlayer", font=("Arial", 14)
+        )
+        self.label_heading.pack()
+
         # VIDEO CANVAS
 
         # Create a canvas that can fit the above video source size
