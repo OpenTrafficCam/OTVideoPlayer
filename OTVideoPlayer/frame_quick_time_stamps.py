@@ -63,6 +63,7 @@ class FrameQuickTimeStamps(tk.LabelFrame):
 
         # Label timestamps file above treeview
         self.stringvar_timestamps_path = tk.StringVar()
+        self.stringvar_timestamps_path.set("Please open or save csv with timestamps!")
         self.label_timestamps_path = tk.Label(
             master=self.frame_tree, textvariable=self.stringvar_timestamps_path
         )
@@ -241,7 +242,7 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         if path:
             # Set new path
             self.path = path
-            self.stringvar_timestamps_path
+            self.stringvar_timestamps_path.set(path)
             # Read buttons from csv file (first line is comment with button names)
             with open(path, "r") as f:
                 comment = f.readline()
@@ -277,7 +278,7 @@ class FrameQuickTimeStamps(tk.LabelFrame):
                 pd.DataFrame(self.timestamps).to_csv(path, index=False, mode="a")
                 # Update file path
                 self.path = path
-                self.stringvar_timestamps_path
+                self.stringvar_timestamps_path.set(path)
             except Exception as e:
                 print(e)
                 self.save_as()
