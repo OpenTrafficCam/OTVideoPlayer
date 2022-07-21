@@ -45,7 +45,7 @@ class FrameVideoPlayer(tk.LabelFrame):
             self.canvas_height * self.video_capture.width / self.video_capture.height
         )
 
-        self.symbol_font_size = 15
+        self.symbol_font_size = 9
         self.symbol_font = font.Font(
             family="Helvetica", size=self.symbol_font_size, weight=font.BOLD
         )
