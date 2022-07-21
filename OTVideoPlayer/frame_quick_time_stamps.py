@@ -209,7 +209,10 @@ class FrameQuickTimeStamps(tk.LabelFrame):
 
     def open(self):
         print("Open timestamps csv")
-        path = filedialog.askopenfilename(filetypes=[("CSV", "*.csv")])
+        path = filedialog.askopenfilename(
+            title="Please choose a csv file of timestamps (metainfo in 1st line)",
+            filetypes=[("CSV", "*.csv")],
+        )
         if path:
             # Set new path
             self.path = path

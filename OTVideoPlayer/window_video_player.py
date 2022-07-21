@@ -54,7 +54,17 @@ class WindowVideoPlayer(tk.Tk):
         if self.frame_video_player:
             self.frame_video_player.destroy()
         if not video_path:
-            video_path = filedialog.askopenfilename()
+            video_path = filedialog.askopenfilename(
+                title="Please choose a video file to play",
+                filetypes=[
+                    ("mp4", "*.mp4"),
+                    ("avi", "*.avi"),
+                    ("mkv", "*.mkv"),
+                    ("mov", "*.mov"),
+                    ("wmv", "*.wmv"),
+                    ("h264", "*.h264"),
+                ],
+            )
         self.frame_video_player = FrameVideoPlayer(master=self, video_path=video_path)
         self.frame_video_player.grid(column=0, row=0, sticky="NSEW")
 
