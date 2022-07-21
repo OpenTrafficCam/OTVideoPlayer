@@ -27,13 +27,19 @@ class VideoCapture:
             seconds=(self.current_frame - 1) / self.fps
         )
 
-    def get_frame(self, frame_number=None):
+    def get_frame(self, frame_number=None, height=None, width=None):
+        if not height:
+            height = self.height
+        if not width:
+            width = self.width
         if not self.capture.isOpened():
             return (ret, None)
         if frame_number:
             self.capture.set(cv2.CAP_PROP_POS_FRAMES, frame_number - 1)
         ret, frame = self.capture.read()
         self.get_current_time()
+        if height != self.height or width != self.width:
+            frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
         return (ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)) if ret else (ret, None)
 
     # Release the video source when the object is destroyed

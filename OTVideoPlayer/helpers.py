@@ -35,7 +35,7 @@ def _get_datetime_from_filename(
     regex = "_([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}_[0-9]{2,2}-[0-9]{2,2}-[0-9]{2,2})"
     match = re.search(regex, filename)
     if not match:
-        return epoch_datetime
+        return dt.datetime.strptime(epoch_datetime, "%Y-%m-%d_%H-%M-%S")
 
     # Assume that there is only one timestamp in the file name
     datetime_str = match[1]
@@ -43,4 +43,4 @@ def _get_datetime_from_filename(
     try:
         return dt.datetime.strptime(datetime_str, "%Y-%m-%d_%H-%M-%S")
     except ValueError:
-        return dt.datetime.strptime(epoch_datetime)
+        return dt.datetime.strptime(epoch_datetime, "%Y-%m-%d_%H-%M-%S")

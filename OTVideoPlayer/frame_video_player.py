@@ -2,6 +2,8 @@ import datetime
 import tkinter as tk
 from pathlib import Path
 from tkinter import font
+from tkinter.messagebox import showinfo
+from turtle import width
 
 import cv2
 import PIL.Image
@@ -12,13 +14,17 @@ from video_capture import VideoCapture
 
 
 class FrameVideoPlayer(tk.LabelFrame):
-    def __init__(self, video_path=None, canvas_height=500, **kwargs):
+    def __init__(self, video_path, canvas_height=500, **kwargs):
         super().__init__(**kwargs)
 
+        self.video_path = video_path
+        self.video_capture = VideoCapture(self.video_path)
         self.paused = True
-        self.update_video(video_path=video_path)
 
         self.canvas_height = canvas_height
+        self.canvas_width = int(
+            self.canvas_height * self.video_capture.width / self.video_capture.height
+        )
 
         self.symbol_font_size = 15
         self.symbol_font = font.Font(
@@ -29,85 +35,87 @@ class FrameVideoPlayer(tk.LabelFrame):
 
         self.after_id = None
 
-    def update_layout(self):
+        self.layout()
+        self.bind_keyboard_and_mouse_events()
+        self.play()
+
+    def layout(self):
+
+        # VIDEO CANVAS
 
         # Create a canvas that can fit the above video source size
         self.canvas = tk.Canvas(
             self,
-            width=int(self.canvas_height * self.vid.width / self.vid.height),
+            width=self.canvas_width,
             height=self.canvas_height,
         )
         self.canvas.pack()
         # self.canvas.config(width=200, height=200)
 
+        # VIDEO CONTROLS
+        self.controls = tk.Frame(master=self)
+        self.controls.pack()
+
         # Play/pause button
         self.btn_play_pause = tk.Button(
-            self,
+            self.controls,
             text=self.SYMBOL_PLAY_PAUSE,
             command=self.play_pause,
             font=self.symbol_font,
         )
         self.btn_play_pause.pack(anchor=tk.CENTER, expand=True, side="left")
 
-        # Move frames buttons
-        delta_frames_list = [-1, +1]
-        self.btn_set_delta_frames = {}
-        for delta_frames in delta_frames_list:
-            delta_frames_str = (
-                f"+{str(delta_frames)}" if delta_frames > 0 else str(delta_frames)
-            )
-            self.btn_set_delta_frames[delta_frames] = tk.Button(
-                self,
-                text=delta_frames_str,
-                # command=lambda: self.set_delta_frames(delta_frames=delta_frames),
-            )
-            self.btn_set_delta_frames[delta_frames].bind(
-                "<ButtonRelease-1>",
-                lambda event, btn=self.btn_set_delta_frames[
-                    delta_frames
-                ]: self.set_delta_frames(event, btn, delta_frames),
-            )  # BUG: #2 Only last delta_frames from delta_frames_list sent to fun
-            self.btn_set_delta_frames[delta_frames].pack(
-                anchor=tk.CENTER, expand=True, side="left"
-            )
+        # Next/previous frames buttons
+        self.button_previous_frame = tk.Button(master=self.controls, text="-1")
+        self.button_previous_frame.bind(
+            "<ButtonRelease-1>",
+            lambda event: self.set_delta_frames(event, delta_frames=-1),
+        )
+        self.button_previous_frame.pack(anchor="center", expand=True, side="left")
+        self.button_next_frame = tk.Button(master=self.controls, text="+1")
+        self.button_next_frame.bind(
+            "<ButtonRelease-1>",
+            lambda event: self.set_delta_frames(event, delta_frames=+1),
+        )
+        self.button_next_frame.pack(anchor="center", expand=True, side="left")
 
         # Slider
         self.slider_frame_var = tk.IntVar()
         self.slider_frame = tk.Scale(
-            self,
+            self.controls,
             orient="horizontal",
             length=400,
             from_=1,
-            to=self.vid.total_frames,
+            to=self.video_capture.total_frames,
+            command=self.slide,
         )
-        self.slider_frame.bind("<ButtonRelease-1>", self.slide)
         self.slider_frame.pack(anchor=tk.CENTER, expand=True, side="left")
 
         # Current time
         self.label_current_time_var = tk.StringVar()
         self.label_current_time = tk.Label(
-            self, text="", textvariable=self.label_current_time_var
+            self.controls, text="", textvariable=self.label_current_time_var
         )
         self.label_current_time.pack(anchor=tk.CENTER, expand=True, side="left")
 
         # Button that lets the user take a snapshot
         self.btn_snapshot = tk.Button(
-            self,
+            self.controls,
             text=self.SYMBOL_SNAPSHOT,
             command=self.snapshot,
             font=self.symbol_font,
         )
         self.btn_snapshot.pack(anchor=tk.CENTER, expand=True, side="left")
 
-    def update_video(self, video_path):
-        # open video source (by default this will try to open the computer webcam)
-        self.video_path = video_path
-        if self.video_path:
-            self.vid = VideoCapture(self.video_path)
-            self.update_layout()
-            self.play()
+    def bind_keyboard_and_mouse_events(self):
+        self.master.bind("<space>", self.play_pause)
+        self.frames_per_mousewheelgrid = 1
+        self.master.bind("<MouseWheel>", self.set_delta_frames)
 
-    def play_pause(self):
+    def test(self, event):
+        print(event)
+
+    def play_pause(self, event=None):
         if self.paused:
             self.paused = False
             self.play()
@@ -118,7 +126,9 @@ class FrameVideoPlayer(tk.LabelFrame):
         # Get a frame from the video source
         if self.frame.any():
             video_path = Path(self.video_path)
-            video_time_str = self.vid.current_time.strftime("%Y-%m-%d_%H-%M-%S-%f")[:-3]
+            video_time_str = self.video_capture.current_time.strftime(
+                "%Y-%m-%d_%H-%M-%S-%f"
+            )[:-3]
             snapshot_path_str = str(
                 video_path.with_stem(f"{video_path.stem}_{video_time_str}").with_suffix(
                     ".jpg"
@@ -128,6 +138,7 @@ class FrameVideoPlayer(tk.LabelFrame):
                 filename=snapshot_path_str,
                 img=cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR),
             )
+            showinfo(self.master, f"Snapshot saved at: {snapshot_path_str}")
 
     def play(self, next_show=None, previous_time=None):
         self.display_new_frame()
@@ -136,7 +147,7 @@ class FrameVideoPlayer(tk.LabelFrame):
             current_time = datetime.datetime.now()
             if previous_time:
                 delay_already = (current_time - previous_time).total_seconds() * 1000
-                delay_wanted = 1000 / self.vid.fps
+                delay_wanted = 1000 / self.video_capture.fps
                 delay_open = max(int(delay_wanted - delay_already), 1)
             else:
                 delay_open = 1
@@ -146,42 +157,54 @@ class FrameVideoPlayer(tk.LabelFrame):
         elif self.after_id:
             self.after_cancel(self.after_id)
 
-    def slide(self, event):
-        frame_number = int(float(self.slider_frame.get()))
-        self.display_new_frame(frame_number)
-
-    def set_delta_frames(self, event, btn, delta_frames: int):
+    def slide(self, event=None):
         if self.paused:
+            frame_number = int(float(self.slider_frame.get()))
+            self.display_new_frame(frame_number)
+
+    def set_delta_frames(self, event=None, delta_frames: int = None):
+        if self.paused:
+            if not delta_frames and event:  # if called from MouseWheel
+                delta_frames = event.delta / 120 * self.frames_per_mousewheelgrid
             if delta_frames == 0:
                 pass
             elif delta_frames == 1:
                 self.display_new_frame()
-            else:
-                new_frame = self.vid.current_frame + delta_frames
+            elif delta_frames:
+                new_frame = self.video_capture.current_frame + delta_frames
                 self.display_new_frame(new_frame)
 
     def display_new_frame(self, frame_number=None):
         # Get a frame from the video source
-        ret, self.frame = self.vid.get_frame(frame_number=frame_number)
+        ret, self.frame = self.video_capture.get_frame(
+            frame_number=frame_number,
+            height=self.canvas_height,
+            width=self.canvas_width,
+        )
 
         if ret:
-            scale = self.canvas_height / self.vid.height
+            scale = self.canvas_height / self.video_capture.height
             self.photo = PIL.ImageTk.PhotoImage(
                 image=PIL.Image.fromarray(self.frame).resize(
-                    (int(scale * self.vid.width), int(scale * self.vid.height))
+                    (
+                        int(scale * self.video_capture.width),
+                        int(scale * self.video_capture.height),
+                    )
                 )
             )
             self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-            self.slider_frame.set(self.vid.current_frame)
+            self.slider_frame.set(self.video_capture.current_frame)
             self.label_current_time_var.set(
                 datetime.datetime.strftime(
-                    self.vid.current_time, "%d.%m.%Y %H:%M:%S.%f"
+                    self.video_capture.current_time, "%d.%m.%Y %H:%M:%S.%f"
                 )[:-3]
             )
 
     def get_timestamp(self):
         return (
-            (self.vid.current_time - EPOCH).total_seconds(),
-            (self.vid.current_time - self.vid.start_time).total_seconds(),
-            int(self.vid.current_frame),
+            (self.video_capture.current_time - EPOCH).total_seconds(),
+            (
+                self.video_capture.current_time - self.video_capture.start_time
+            ).total_seconds(),
+            int(self.video_capture.current_frame),
         )
