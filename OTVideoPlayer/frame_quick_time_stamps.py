@@ -20,12 +20,9 @@
 import datetime as dt
 import tkinter as tk
 from pathlib import Path
-from pydoc import visiblename
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 import pandas as pd
-from numpy import var
-from pyparsing import col
 
 from helpers import EPOCH
 

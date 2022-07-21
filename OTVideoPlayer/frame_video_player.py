@@ -22,7 +22,6 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import font
 from tkinter.messagebox import showinfo
-from turtle import width
 
 import cv2
 import PIL.Image
