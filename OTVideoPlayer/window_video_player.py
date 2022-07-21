@@ -29,7 +29,7 @@ from helpers import ON_WINDOWS
 class WindowVideoPlayer(tk.Tk):
     def __init__(
         self,
-        title="OTVideoPlayer",
+        title="OTVideoPlayer Standalone Application",
         video_path=None,
         quick_time_stamps_enabled=True,
         **kwargs
