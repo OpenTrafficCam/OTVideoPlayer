@@ -20,7 +20,7 @@
 import datetime
 import tkinter as tk
 from pathlib import Path
-from tkinter import font
+from tkinter import font, ttk
 from tkinter.messagebox import showinfo
 
 import cv2
@@ -90,11 +90,13 @@ class FrameVideoPlayer(tk.LabelFrame):
         self.btn_play_pause.pack(anchor=tk.CENTER, expand=True, side="left")
 
         # Next/previous frames buttons
+        # +1
         self.button_previous_frame = tk.Button(master=self.controls, text="-1")
         self.button_previous_frame.bind(
             "<ButtonRelease-1>",
             lambda event: self.set_delta_frames(event, delta_frames=-1),
         )
+        # -1
         self.button_previous_frame.pack(anchor="center", expand=True, side="left")
         self.button_next_frame = tk.Button(master=self.controls, text="+1")
         self.button_next_frame.bind(
@@ -102,6 +104,35 @@ class FrameVideoPlayer(tk.LabelFrame):
             lambda event: self.set_delta_frames(event, delta_frames=+1),
         )
         self.button_next_frame.pack(anchor="center", expand=True, side="left")
+        # n
+        self.spinbox_step_frames_var = tk.StringVar()
+        self.spinbox_step_frames_var.set(str(20))
+        self.spinbox_step_frames = ttk.Spinbox(
+            master=self.controls,
+            from_=2,
+            to=100,
+            width=3,
+            textvariable=self.spinbox_step_frames_var,
+        )
+        self.spinbox_step_frames.pack(anchor="center", expand=True, side="left")
+        # -n
+        self.button_n_frames_forward = tk.Button(master=self.controls, text="-")
+        self.button_n_frames_forward.bind(
+            "<ButtonRelease-1>",
+            lambda event: self.set_delta_frames(
+                event, delta_frames=-int(self.spinbox_step_frames_var.get())
+            ),
+        )
+        self.button_n_frames_forward.pack(anchor="center", expand=True, side="left")
+        # +n
+        self.button_n_frames_backward = tk.Button(master=self.controls, text="+")
+        self.button_n_frames_backward.bind(
+            "<ButtonRelease-1>",
+            lambda event: self.set_delta_frames(
+                event, delta_frames=+int(self.spinbox_step_frames_var.get())
+            ),
+        )
+        self.button_n_frames_backward.pack(anchor="center", expand=True, side="left")
 
         # Slider
         self.slider_frame_var = tk.IntVar()
