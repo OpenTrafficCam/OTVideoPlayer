@@ -28,10 +28,11 @@ from helpers import EPOCH
 
 
 class FrameQuickTimeStamps(tk.LabelFrame):
-    def __init__(self, **kwargs):
+    def __init__(self, buttons_per_row=6, **kwargs):
         super().__init__(**kwargs)
         self.path = None
         self.btns = {}
+        self.buttons_per_row = buttons_per_row
         self.timestamps = []
         self.tree_visibility_dict = {
             "video": True,
@@ -151,8 +152,15 @@ class FrameQuickTimeStamps(tk.LabelFrame):
                 text=label,
                 command=lambda: self.add_timestamp(label),
             )
-            self.btns[label].pack(
-                anchor=tk.CENTER, expand=True, padx=5, pady=5, side="left"
+            row = (len(self.btns) - 1) // self.buttons_per_row
+            column = (len(self.btns) - 1) % self.buttons_per_row
+            # bad option "-anchor": must be -column, -columnspan, -in, -ipadx, -ipady, -padx, -pady, -row, -rowspan, or -sticky
+            self.btns[label].grid(
+                row=row,
+                column=column,
+                sticky="nesw",
+                padx=5,
+                pady=5,
             )
 
     def delete_button(self, label=None):
