@@ -41,15 +41,15 @@ def _get_datetime_from_filename(
     filename: str, epoch_datetime="1970-01-01_00-00-00"
 ) -> str:
     """Get date and time from file name.
-    Searches for "_yyyy-mm-dd_hh-mm-ss".
-    Returns "yyyy-mm-dd_hh-mm-ss".
+    Searches for "yyyy-mm-dd_hh-mm-ss".
+    Returns datetime object.
 
     Args:
         filename (str): filename with expression
         epoch_datetime (str): Unix epoch (00:00:00 on 1 January 1970)
 
     Returns:
-        str: datetime
+        dt.datetime: datetime object
     """
     regex = "([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}_[0-9]{2,2}-[0-9]{2,2}-[0-9]{2,2})"
     match = re.search(regex, filename)
