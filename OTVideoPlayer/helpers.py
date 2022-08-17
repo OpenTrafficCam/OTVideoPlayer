@@ -51,7 +51,7 @@ def _get_datetime_from_filename(
     Returns:
         str: datetime
     """
-    regex = "_([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}_[0-9]{2,2}-[0-9]{2,2}-[0-9]{2,2})"
+    regex = "([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}_[0-9]{2,2}-[0-9]{2,2}-[0-9]{2,2})"
     match = re.search(regex, filename)
     if not match:
         return dt.datetime.strptime(epoch_datetime, "%Y-%m-%d_%H-%M-%S")
