@@ -23,9 +23,17 @@ from pathlib import Path
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 import pandas as pd
-
 from helpers import EPOCH
 
+REALTIME = "realtime"
+VIDEOTIME = "videotime"
+FRAME = "frame"
+EVENT = "event"
+VIDEOPATH = "videopath"
+CREATED = "created"
+CREATOR = "creator"
+
+HEADERS = [REALTIME, VIDEOTIME, FRAME, EVENT, VIDEOPATH, CREATED, CREATOR]
 
 class FrameQuickTimeStamps(tk.LabelFrame):
     def __init__(self, buttons_per_row=6, **kwargs):
@@ -212,13 +220,13 @@ class FrameQuickTimeStamps(tk.LabelFrame):
         ) = self.master.frame_video_player.get_timestamp()
         self.timestamps.append(
             {
-                "realtime": timestamp_real,
-                "videotime": timestamp_video,
-                "frame": frame,
-                "event": label,
-                "videopath": videopath,
-                "created": (dt.datetime.now() - EPOCH).total_seconds(),
-                "creator": os.getlogin(),
+                REALTIME: timestamp_real,
+                VIDEOTIME: timestamp_video,
+                FRAME: frame,
+                EVENT: label,
+                VIDEOPATH: videopath,
+                CREATED: (dt.datetime.now() - EPOCH).total_seconds(),
+                CREATOR: os.getlogin(),
             }
         )
 
@@ -270,23 +278,25 @@ class FrameQuickTimeStamps(tk.LabelFrame):
             self.save(path=path)
 
     def save(self, event=None, path=None):
-        if self.timestamps:
-            print("Save timestamps csv")
-            if not path:
-                path = self.path
-            try:
-                # Write to csv file (first line is comment with button names)
-                with open(path, "w") as f:
-                    btns_str = ",".join(self.btns.keys())
-                    f.write(f"# Buttons: {btns_str}\n")
+        print("Save timestamps csv")
+        if not path:
+            path = self.path
+        try:
+            # Write to csv file (first line is comment with button names)
+            with open(path, "w") as f:
+                btns_str = ",".join(self.btns.keys())
+                f.write(f"# Buttons: {btns_str}\n")
+            if self.timestamps:
                 # Convert timestamps to table and write to csv file using pandas
                 pd.DataFrame(self.timestamps).to_csv(path, index=False, mode="a")
-                # Update file path
-                self.path = path
-                self.stringvar_timestamps_path.set(path)
-            except Exception as e:
-                print(e)
-                self.save_as()
+            else:
+                pd.DataFrame(columns=HEADERS).to_csv(path, index=False, mode="a")
+            # Update file path
+            self.path = path
+            self.stringvar_timestamps_path.set(path)
+        except Exception as e:
+            print(e)
+            self.save_as()
 
 
 class MenuQuickTimeStamps(tk.Menu):
