@@ -36,7 +36,7 @@ CREATOR = "creator"
 HEADERS = [REALTIME, VIDEOTIME, FRAME, EVENT, VIDEOPATH, CREATED, CREATOR]
 
 class FrameQuickTimeStamps(tk.LabelFrame):
-    def __init__(self, buttons_per_row=6, **kwargs):
+    def __init__(self, buttons_per_row=3, **kwargs):
         super().__init__(**kwargs)
         self.path = None
         self.btns = {}
